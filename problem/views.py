@@ -1,6 +1,8 @@
+from multiprocessing.pool import AsyncResult
 import time,subprocess
 from .tasks import celery_run
 from django.shortcuts import render
+from celery.result import AsyncResult
 
 def home(request):
     if 'mainform' in request.POST:
@@ -18,7 +20,9 @@ def home(request):
         dur = request.POST.get('dur')
         cmd ='powershell -command '+command 
         result=celery_run.delay(cmd,rep,dur)
-        context = {'output':result}
+        s=AsyncResult(result.id)
+        r=s.get()
+        context = {'output':r}
         return render(request,'home.html',context)       
     return render(request,'home.html')
 

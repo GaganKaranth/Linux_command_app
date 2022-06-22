@@ -4,7 +4,7 @@ import time,subprocess
 
 app = Celery('tasks', broker='redis://localhost:6379',include=['problem.tasks.add'])
 
-@shared_task
+@shared_task()
 def celery_run(cmd,rep,dur):
     output=''
     for i in range(int(rep)):
