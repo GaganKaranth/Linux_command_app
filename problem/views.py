@@ -1,6 +1,7 @@
 from multiprocessing.pool import AsyncResult
 import time,subprocess
 from .tasks import celery_run
+from .models import Outputs
 from django.shortcuts import render
 from celery.result import AsyncResult
 
@@ -32,5 +33,8 @@ def runcommand(cmd,rep,dur):
         time.sleep(int(dur))
         p=subprocess.run(cmd,capture_output=True,text=True,shell=True)
         output += p.stdout
+        out=Outputs()
+        out.op=output
+        out.save()
     return output
         
