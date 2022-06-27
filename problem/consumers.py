@@ -1,22 +1,25 @@
-# Import JSON module
 import json
-# Import WebsocketConsumer
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer
 from .models import Outputs
-from channels.db import database_sync_to_async
+from .views import rep
+from django.core import serializers
 
-# Define the consumer class to send the data through WebsocketConsumer
-class ws_consumer(AsyncWebsocketConsumer):
-    async def connect(self):
+class ws_consumer(WebsocketConsumer):
+    def connect(self):
         self.accept()
-        #while(True):
-        #    res=Outputs.objects.first().op
-         #   self.send(json.dumps({'output': res}))
-        res=await self.get_name()
-        self.send(json.dumps({'output': res}))
+        i=1
+        while(True):
+            res = Outputs.objects.latest('id')
+            serialized_obj = serializers.serialize('json',[res])
+            self.send(json.dumps({'output':serialized_obj}))
+            i+=1
+            if(i==rep):
+                break
+    #def disconnect(self, event):
+      #  return super().disconnect()
 
-    @database_sync_to_async
-    def get_name(self):
-        return Outputs.objects.first().op
+            
+            
+            
         
         
